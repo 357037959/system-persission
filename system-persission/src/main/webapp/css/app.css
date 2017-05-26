@@ -1,0 +1,102 @@
+body{
+	font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif !important;
+	font-size:12px !important;
+	margin:0px;
+	background-color:#F8F8F8;
+}
+
+input, textarea, keygen, select, button{
+	font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif !important;
+	font-size:12px !important;
+}
+
+.app_context{
+	width:100%;
+	padding-left:15px;
+	padding-right:10px;
+	padding-top:5px;
+	background-color:#FFFFFF;
+	
+}
+.app_title{
+	height:40px;
+	line-height:40px;	
+	font-size: 14px;
+	font-weight:bold;
+	
+}
+
+.app_title_show{
+	margin-left:10px;float:left;font-size:16px;
+	border-bottom:solid 3px #198CCF;
+	padding-left:10px;padding-right:10px;
+}
+.app_line{
+	height:1px;	
+	width:100%;
+	border-bottom:solid #E7E6E6 1px;
+	margin-bottom: 15px;
+}
+
+
+.app_bar{
+	margin-top: 10px;
+	width:100%;
+	height:40px;
+	line-height:40px;
+	margin-bottom:10px;
+}
+
+.app_form{
+	margin-top:15px;
+}
+
+.app_form_item{
+	width:100%;
+	height:40px;
+}
+.app_form_label{
+	width:100px;
+	text-align: right;
+	display:inline-block;
+	margin-right: 5px;
+}
+
+div.app_form_item > span.warn{
+	color:red;
+}
+
+.app_bar_bottom{
+	width:100%;
+	text-align: center;
+	height: 60px;
+	line-height:60px;
+	background-color:#F9FCFF;
+}
+
+.app_button_right{
+	margin-right:25px;float:right;
+}
+
+.el-table{
+	font-size:12px !important;
+}
+
+.pagination{
+	height:45px;
+	line-height:45px;
+	text-align:left;
+	margin-top:15px;
+	pading:5px;
+
+}
+
+.skin{
+	width:105px; height:85px;display:inline-block;margin-left:10px;text-align:center;
+}
+
+.skinselected{
+	width:105;height:85px;text-align:center;line-height:85px;position:absolute;z-index:100;display:none;
+}
+
+

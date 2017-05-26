@@ -1,0 +1,51 @@
+<div id="app" class="app_context" v-loading.fullscreen.lock="loading">
+	<div class="app_title">
+		<div class="app_title_show">用户管理</div>
+		<div style="float: right; margin-right: 20px;">
+			<el-button type="primary" @click="onAddUser()" icon="plus" size="small">添加</el-button>
+		</div>
+	</div>
+	<div class="app_line"></div>
+	<div class="app_bar">
+		<el-input placeholder="用户名" style="display:inline-block;" size="small" v-model="user" width="200"></el-input>
+		<el-input placeholder="姓名" style="display:inline-block;" size="small" v-model="user" width="200"></el-input>
+		<el-input placeholder="邮箱" style="display:inline-block;" size="small" v-model="dept" width="200"></el-input>
+		<el-button icon="search" type="primary" size="small" @click="onSearch()">查询</el-button>
+	</div>
+	<el-table :data="tableData" border highlight-current-row style="width:100%">
+		<el-table-column prop="usercode" label="编号" width="200" header-align="center"></el-table-column>
+		<el-table-column prop="username" label="姓名" width="100"> </el-table-column>
+		<el-table-column prop="gender" label="性别" width="65"></el-table-column>
+		<el-table-column prop="deptname" label="部门" width="200"></el-table-column>
+		<el-table-column prop="email" label="邮件" header-align="center"></el-table-column>
+		<el-table-column label="操作" width="180" :context="_self" inline-template>
+		<div>
+			<el-button size="small" @click="onEdit($index, row)" type="primary"> 编辑 </el-button>
+			<el-button size="small" type="danger" @click="onDel($index,row)"> 删除 </el-button>
+		</div>
+		</el-table-column>
+	</el-table>
+	<div class="pagination">
+		<el-pagination @current-change="onCurrentChange" :current-page="page.thepage" :page-size="page.pageSize" layout="total, prev, pager, next, jumper" :total="page.total"></el-pagination>
+	</div>
+	<el-dialog :title="titleStr" v-model="dialogFormVisible" style="width:1250px;">
+		<el-form:model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"style="width:500px;">
+			<el-form-item label="系统PK" prop="pk" v-show="false"><el-input v-model="ruleForm.pk" width="80%"></el-input></el-form-item>
+			<el-form-item label="用户编码" prop="usercode"><el-input v-model="ruleForm.usercode" :disabled="funFlag"></el-input></el-form-item>
+			<el-form-item label="输入姓名" prop="username"><el-input v-model="ruleForm.username"></el-input></el-form-item>
+			<el-form-item label="性别选择" prop="gender">
+				<el-radio-group v-model="ruleForm.gender"><el-radio label="男"></el-radio><el-radio label="女"></el-radio></el-radio-group>
+			</el-form-item>
+			<el-form-item label="邮件地址" prop="email"><el-input v-model="ruleForm.email"></el-input></el-form-item>
+			<el-form-item label="工作电话" prop="work_phone"><el-input v-model="ruleForm.work_phone"></el-input></el-form-item>
+			<el-form-item label="移动电话" prop="mobile_phone"><el-input v-model="ruleForm.mobile_phone"></el-input></el-form-item>
+			<el-form-item label="输入密码" prop="password"><el-input type="password" v-model="ruleForm.password"></el-input></el-form-item>
+			<template v-if="editoradd=='add'">
+				<el-form-item><el-button type="primary" @click="doSubmitAdd">保存</el-button><el-button @click="doReset">重置</el-button> </el-form-item>
+			</template> 
+			<template v-else> 
+				<el-form-item><el-button type="primary" @click="doSubmitEdit">保存</el-button><el-button @click="quitEdit()">取消</el-button></el-form-item>
+			</template>
+		</el-form>
+	</el-dialog>
+</div>
