@@ -1095,7 +1095,6 @@
 
 			postVars.name = encodeURI(this.get("name"));
 			postVars.size = this.get("size");
-			console.log(JSON.stringify(postVars));
 			var method = this.get("uploadMethod");
 			this.set("uploadURL", 'formUpload' === method ? url : fAddVars(postVars, url));
 			this.set("parameters", postVars);
@@ -1451,7 +1450,7 @@
 			var xhr = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
 			
 			var vars = {
-				name:	 file.get('name'),
+				name: encodeURI(file.get('name')),
 				type: file.get('type'),
 				size: file.get('size'),
 				modified: file.get("dateModified") + ""
