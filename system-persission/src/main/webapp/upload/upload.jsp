@@ -10,86 +10,121 @@
 <script src="../../js/app.js"></script>
 <script src="/element/lib/index.js"></script>
 <link href="/css/stream-v1.css" rel="stylesheet" type="text/css">
-<title>上载</title>
+<title>上传</title>
 </head>
 <body>
 <div id="app" class="app_context" v-loading.fullscreen.lock="loading">
 	<div id="i_select_files" style="display: none;"></div>
 	<div id="i_stream_files_queue" style="display: block;"></div>
 	<div class="app_title">
-		<div class="app_title_show">上载</div>
-		<div style="float: right; margin-right: 20px;">
-			<el-button type="primary" @click="onAddUser()" icon="plus" size="small">已上载记录</el-button>
+		<div class="app_title_show">上传</div>
+		<div style="float: right;">
+<!-- 			<el-button type="primary" @click="onAddUser()" icon="plus" size="small">已上载记录</el-button> -->
 		</div>
 	</div>
 	<div class="app_line"></div>
 	<div class="app_bar">
-		<el-button icon="upload" type="primary" size="small" @click="upload('video')">上载视频</el-button>
-		<el-button icon="upload" type="primary" size="small" @click="selectAudio()">上载音频</el-button>
-		<el-button icon="upload" type="primary" size="small" @click="upload('document')">上载文稿</el-button>
-		<el-button icon="upload" type="primary" size="small" @click="selectSubtitle()">上载字幕</el-button>
-		<el-button icon="upload" type="primary" size="small" @click="upload('image')">上载图片</el-button>
-		<el-button icon="upload" type="primary" size="small" @click="upload('file')">其他文件</el-button>
+		<div style="float: left;">
+			<el-button type="primary" size="small" @click="upload('audioandvedio')">上传 音视频</el-button>
+			<el-button type="primary" size="small" @click="upload('video')">视轨</el-button>
+			<el-button type="primary" size="small" @click="selectAudio()">音轨</el-button>
+			<el-button type="primary" size="small" @click="upload('script')">文稿</el-button>
+			<el-button type="primary" size="small" @click="selectSubtitle()">字幕</el-button>
+			<el-button type="primary" size="small" @click="upload('image')">图片</el-button>
+			<el-button type="primary" size="small" @click="upload('other')">其他文件</el-button>
+		</div>
+		<div style="float: right;">
+			<el-button type="primary" size="small" @click="selectAudio()">完成</el-button>
+			<el-button type="primary" size="small" @click="upload('video')">保存</el-button>
+		</div>
 	</div>
-	<el-table :data="tableData" style="width:100%" border highlight-current-row default-expand-all>
-		<el-table-column type="expand" >
-		<template scope="props">
-			<li :id="props.row.fileBarId" class="stream-cell-file" style="border-color: #fff;">
-				<div class="stream-process"> 
-					<span class="stream-process-bar"><span class="bar-width" :style="props.row.barWidth"></span></span> 
-			    	<span class="stream-percent">{{props.row.percent}}</span>
-				</div>
-				<div class="stream-cell-infos"> 
-			    	<span class="stream-cell-info">速度：<em class="stream-speed">{{props.row.formatSpeed}}</em></span> 
-			    	<span class="stream-cell-info">已上传：<em class="stream-uploaded">{{props.row.formatLoaded}}/{{props.row.formatSize}}</em></span> 
-			    	<span class="stream-cell-info">剩余时间：<em class="stream-remain-time">{{props.row.formatTimeLeft}}</em></span>
-				</div>
-			</li>
-		</template>
-		</el-table-column>
-		<el-table-column prop="fileId" label="索引"></el-table-column>
-		<el-table-column prop="fileType" label="类型" :formatter="fileTypeFormatter"></el-table-column>
-		<el-table-column prop="fileName" label="文件名"></el-table-column>
-		<el-table-column label="操作" :context="_self" inline-template>
-		<template>
-			<el-button size="small" @click="deleteFile($index, row)" type="danger"> 删除 </el-button>
-		</template>
-		</el-table-column>
-	</el-table>
-	<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="width: 500px; margin-top: 20px;">
-		<el-form-item label="标识" prop="pk" v-show="false"><el-input v-model="ruleForm.pk"></el-input></el-form-item>
-		<el-form-item label="标题" prop="title"><el-input v-model="ruleForm.title"></el-input></el-form-item>
-		<el-form-item label="版本" prop="version"><el-input v-model="ruleForm.version"></el-input></el-form-item>
-		<el-form-item label="资源类型" prop="resource">
-			<el-radio-group v-model="ruleForm.resource"><el-radio label="true">节目</el-radio><el-radio label="false">素材</el-radio></el-radio-group>
-		</el-form-item>
-		<el-form-item label="节目代码" prop="code"><el-input v-model="ruleForm.code"></el-input></el-form-item>
-		<el-form-item label="节目分类" prop="classification">
-			<el-select v-model="ruleForm.classification" placeholder="请选择节目分类">
-				<el-option :label="item.classificationName" :value="item.classification" v-for="item in classificationList"></el-option>
-			</el-select>
-		</el-form-item>
-		<el-form-item label="所属栏目" prop="column">
-			<el-select v-model="ruleForm.column" placeholder="请选择所属栏目">
-				<el-option :label="item.columnName" :value="item.column" v-for="item in columnList"></el-option>
-			</el-select>
-		</el-form-item>
-		<el-form-item label="码流" prop="stream">
-			<el-select v-model="ruleForm.stream" placeholder="请选择码流">
-				<el-option :label="item.streamName" :value="item.stream" v-for="item in streamList"></el-option>
-			</el-select>
-		</el-form-item>
-		<el-form-item label="适配终端" prop="terminal">
-			<el-select v-model="ruleForm.terminal" placeholder="请选择适配终端">
-				<el-option :label="item.terminalName" :value="item.terminal" v-for="item in terminalList"></el-option>
-			</el-select>
-		</el-form-item>
-		<el-form-item label="简介" prop="introduction"><el-input v-model="ruleForm.introduction"></el-input></el-form-item>
-		<el-form-item><el-button type="primary" @click="doUpload">保存</el-button></el-form-item>
-	</el-form>
+	<el-row>
+		<el-col :span="12">
+			<el-table :data="tableData" style="width:100%" border highlight-current-row default-expand-all>
+				<el-table-column type="expand" >
+				<template scope="props">
+					<li :id="props.row.fileBarId" class="stream-cell-file" style="border-color: #fff;">
+						<div class="stream-process"> 
+							<span class="stream-process-bar"><span class="bar-width" :style="props.row.barWidth"></span></span> 
+					    	<span class="stream-percent">{{props.row.percent}}%</span>
+						</div>
+						<div class="stream-cell-infos"> 
+					    	<span class="stream-cell-info">速度：<em class="stream-speed">{{props.row.formatSpeed}}</em></span> 
+					    	<span class="stream-cell-info">已上传：<em class="stream-uploaded">{{props.row.formatLoaded}}/{{props.row.formatSize}}</em></span> 
+					    	<span class="stream-cell-info">剩余时间：<em class="stream-remain-time">{{props.row.formatTimeLeft}}</em></span>
+						</div>
+					</li>
+				</template>
+				</el-table-column>
+				<el-table-column prop="fileId" label="索引"></el-table-column>
+				<el-table-column prop="fileType" label="类型" :formatter="fileTypeFormatter"></el-table-column>
+				<el-table-column prop="fileName" label="文件名"></el-table-column>
+				<el-table-column label="操作" :context="_self" inline-template>
+				<template>
+					<el-button size="small" @click="deleteFile($index, row)" type="danger"> 删除 </el-button>
+				</template>
+				</el-table-column>
+			</el-table>
+		</el-col>
+		<el-col :span="12">
+			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+				<el-form-item label="标识" prop="pkGUID" v-show="false"><el-input v-model="ruleForm.pkGUID"></el-input></el-form-item>
+				<el-row>
+					<el-col :span="12"><el-form-item label="标题" prop="title"><el-input v-model="ruleForm.title"></el-input></el-form-item></el-col>
+					<el-col :span="12"><el-form-item label="版本" prop="version"><el-input v-model="ruleForm.version"></el-input></el-form-item></el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="资源类型" prop="proMat">
+							<el-radio-group v-model="ruleForm.proMat"><el-radio label="program">节目</el-radio><el-radio label="material">素材</el-radio></el-radio-group>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12"><el-form-item label="节目代码" prop="programCode"><el-input v-model="ruleForm.programCode"></el-input></el-form-item></el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="节目分类" prop="programType">
+							<el-select v-model="ruleForm.programType" placeholder="请选择节目分类">
+								<el-option :label="item.programname" :value="item.programCode" v-for="item in programTypeList"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="所属栏目" prop="mediaColumnCode">
+							<el-select v-model="ruleForm.mediaColumnCode" placeholder="请选择所属栏目">
+								<el-option :label="item.columnname" :value="item.columnid" v-for="item in columnList"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="码流" prop="bitType">
+							<el-select v-model="ruleForm.bitType" placeholder="请选择码流">
+								<el-option :label="item.bitName" :value="item.bitCode" v-for="item in bitList"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="适配终端" prop="terminal">
+							<el-select v-model="ruleForm.terminal" placeholder="请选择适配终端">
+								<el-option :label="item.terminalName" :value="item.terminalType" v-for="item in terminalList"></el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-form-item label="简介" prop="content"><el-input v-model="ruleForm.content" type="textarea" :autosize="{minRows: 5}"></el-input></el-form-item>
+			</el-form>
+		</el-col>
+	</el-row>
 	
 	<el-dialog :title="audioDialog.title" v-model="audioDialog.display" style="width:1250px;">
 		<el-form :model="audioDialog" :rules="rules" ref="audioForm" label-width="100px" style="width:500px;">
+			<el-form-item label="音频文件声道" prop="language">
+				<el-select v-model="audioDialog.channel">
+					<el-option :label="item.channelName" :value="item.channel" v-for="item in channelList"></el-option>
+				</el-select>
+			</el-form-item>
 			<el-form-item label="音频文件语种" prop="language">
 				<el-select v-model="audioDialog.language">
 					<el-option :label="item.languageName" :value="item.language" v-for="item in languageList"></el-option>
@@ -115,32 +150,25 @@
 <script type="text/javascript" src="/js/stream-v1.js"></script>
 <script>
 var FileType = {
-	"video" : "视频",
-	"audio" : "音频",
-	"document" : "文档",
-	"subtitle" : "字幕",
-	"image" : "图片",
-	"file" : "文件"
+	"audioandvedio" : "音视频", "video" : "视轨", "audio" : "音轨", "script" : "文稿", "subtitle" : "字幕", "image" : "图片", "other" : "文件"
 }
 
 var LanguageType = {
-	"chinese" : "中文",
-	"english" : "英文",
-	"french" : "法文"
+	"chinese" : "中文", "english" : "英文", "french" : "法文"
 }
 
 //表单对象
 var ruleForm = {
-	pk : '',
-	title : '',
-	version : '',
-	resource : "true",
-	code : '',
-	classification : '',
-	column : '',
-	stream : '',
-	terminal : '',
-	introduction : ''
+	"pkGUID" : "",
+	"title" : "",
+	"proMat" : "program",
+	"programCode" : "",
+	"programType" : "",
+	"mediaColumnCode" : "",
+	"mediaColumnName" : "",
+	"bitType" : "",
+	"terminalType" : "",
+	"content" : ""
 };
 
  // 表单验证
@@ -188,47 +216,72 @@ var vm = new Vue({
 		ruleForm : ruleForm,
 		rules : rules,
 		loading : true,
-		classificationList : [],
-		columnList : [],
-		streamList : [ {
-			"stream" : "super",
-			"streamName" : "超清"
+		programTypeList : [ {
+			"programCode" : "001", "programname" : "新闻类"
 		}, {
-			"stream" : "hight",
-			"streamName" : "高清"
+			"programCode" : "002", "programname" : "电视剧"
 		}, {
-			"stream" : "normal",
-			"streamName" : "标清"
+			"programCode" : "003", "programname" : "综艺"
+		}, {
+			"programCode" : "004", "programname" : "体育"
+		} ],
+		columnList : [ {
+			"columnid" : "BJ001_03", "columnname" : "城市人家"
+		}, {
+			"columnid" : "BJ001_04", "columnname" : "服装秀"
+		}, {
+			"columnid" : "BJ001_05", "columnname" : "道德与法制"
+		} ],
+		channelList : [ {
+			"channel" : "00", "channelName" : "混音"
+		}, {
+			"channel" : "01", "channelName" : "声道01"
+		}, {
+			"channel" : "02", "channelName" : "声道02"
+		}, {
+			"channel" : "03", "channelName" : "声道03"
+		}, {
+			"channel" : "04", "channelName" : "声道04"
+		}, {
+			"channel" : "05", "channelName" : "声道05"
+		}, {
+			"channel" : "06", "channelName" : "声道06"
+		}, {
+			"channel" : "07", "channelName" : "声道07"
+		}, {
+			"channel" : "08", "channelName" : "声道08"
+		} ],
+		bitList : [ {
+			"bitCode" : "archive", "bitName" : "归档码流"
+		}, {
+			"bitCode" : "play", "bitName" : "播放码流"
+		}, {
+			"bitCode" : "review", "bitName" : "预览码流"
 		} ],
 		terminalList : [ {
-			"terminal" : "tv",
-			"terminalName" : "TV端"
+			"terminalType" : "TV", "terminalName" : "电视"
 		}, {
-			"terminal" : "pc",
-			"terminalName" : "PC端"
+			"terminalType" : "PC", "terminalName" : "PC端"
 		}, {
-			"terminal" : "mobile",
-			"terminalName" : "移动端"
+			"terminalType" : "MO", "terminalName" : "移动端"
 		}],
 		audioDialog : {
-			title : "音频文件语种",
+			title : "音频文件声道/语种",
 			display : false,
+			channel : '',
 			language : ''
 		},
 		subtitleDialog : {
-			title : "字母文件语种",
+			title : "字幕文件语种",
 			display : false,
 			language : ''
 		},
 		languageList : [ {
-			"language" : "chinese",
-			"languageName" : "中文"
+			"language" : "chinese", "languageName" : "中文"
 		}, {
-			"language" : "english",
-			"languageName" : "英文"
+			"language" : "english", "languageName" : "英文"
 		}, {
-			"language" : "french",
-			"languageName" : "法文"
+			"language" : "french", "languageName" : "法文"
 		} ]
 	},
 	el : '#app',
@@ -286,6 +339,28 @@ var vm = new Vue({
 	}
 });
 
+var setStreamProcessBar = function(p) {
+	var barId = "#stream-process-bar_" + p.id;
+	$(barId + " .bar-width").css("width", p.percent + "%");
+	$(barId + " .stream-percent").html(p.percent + "%");
+	if (p.formatSpeed) {
+		$(barId + " .stream-speed").html(p.formatSpeed);
+	}
+	$(barId + " .stream-uploaded").html(p.formatLoaded + "/" + p.formatSize);
+	$(barId + " .stream-remain-time").html(p.formatTimeLeft);
+	
+	var dataFile = DataFileMap[p.id];
+	dataFile['barWidth'] = "width: " + p.percent + "%;";
+	dataFile['percent'] = p.percent;
+	if (p.formatSpeed) {
+		dataFile['formatSpeed'] = p.formatSpeed;
+	}
+	dataFile['formatLoaded'] = p.formatLoaded;
+	dataFile['formatSize'] = p.formatSize;
+	dataFile['formatTimeLeft'] = p.formatTimeLeft;
+	dataFile['totalPercent'] = p.totalPercent;
+}
+
 var config = {
 	customered : true,
 	browseFileId : "i_select_files",
@@ -293,10 +368,8 @@ var config = {
 	filesQueueId : "i_stream_files_queue",
 	filesQueueHeight : 200,
 	messagerId : "i_stream_message_container",
-	multipleFiles: true,
 	autoUploading: true,
-	onRepeatedFile: true,
-// 	maxSize: 104857600,
+	maxSize: 9007199254740992,
 	retryCount : 5,
 // 	postVarsPerFile : {
 // 		param1: "val1",
@@ -308,23 +381,6 @@ var config = {
 	simLimit: 200,
 // 	extFilters: [".txt", ".rpm", ".rmvb", ".gz", ".rar", ".zip", ".avi", ".mkv", ".mp3", ".ts"],
 	onSelect: function(list) {
-// 		var language = '';
-// 		if ('audio' === _t.uploadType) {
-// 			vm._data.audioDialog.display = false;
-// 			language = vm._data.audioDialog.language;
-// 		} else if ('subtitle' === _t.uploadType) {
-// 			vm._data.subtitleDialog.display = false;
-// 			language = vm._data.subtitleDialog.language;
-// 		}
-// 		var length = list.length;
-// 		for (var i = 0; i < length; i++) {
-// 			var streamFile = list[i];
-// 			var dataFile = new DataFile(streamFile.id, FileType[_t.uploadType], streamFile.name, language);
-// 			DataFileMap[streamFile.id] = dataFile;
-// 			vm._data.tableData.push(dataFile);
-// 		}
-// 		vm._data.audioDialog.language = '';
-// 		vm._data.subtitleDialog.language = '';
 	},
 	onMaxSizeExceed: function(file) {
 		vm.$message({
@@ -340,23 +396,18 @@ var config = {
 //	 	alert('onExtNameMismatch');
 	},
 	onCancel : function(file) {
-//	 	alert('Canceled: ' + file.name);
-		alert("onCancel");
+		console.log(JSON.stringify("onCancel"));
 	},
 	onComplete: function(file) {
-		var barId = "#stream-process-bar_" + file.id;
-		$(barId + " .bar-width").css("width", "100%");
-		$(barId + " .stream-percent").html("100%");
-		$(barId + " .stream-uploaded").html(file.formatLoaded + "/" + file.formatSize);
-		$(barId + " .stream-remain-time").html("00:00:00");
-		
-		var dataFile = DataFileMap[file.id];
-		dataFile['barWidth'] = "width: 100%;";
-		dataFile['percent'] = "100%";
-		dataFile['formatLoaded'] = file.formatLoaded;
-		dataFile['formatSize'] = file.formatSize;
-		dataFile['formatTimeLeft'] = "00:00:00";
-		dataFile['totalPercent'] = file.totalPercent;
+		var params = {
+			id : file.id,
+			percent : "100",
+			formatLoaded : file.formatLoaded,
+			formatSize : file.formatSize,
+			formatTimeLeft : "00:00:00",
+			totalPercent : file.totalPercent
+		}
+		setStreamProcessBar(params);
 	},
 	onQueueComplete: function() {
 //	 	alert('onQueueComplete');
@@ -380,30 +431,38 @@ var config = {
 		
 		vm._data.audioDialog.language = '';
 		vm._data.subtitleDialog.language = '';
+		
+		var params = {
+			id : file.id,
+			percent : "0",
+			formatLoaded : "0",
+			formatSpeed : "--",
+			formatSize : file.formatSize,
+			formatTimeLeft : "--:--:--",
+			totalPercent : file.totalPercent
+		}
+		setStreamProcessBar(params);
 	},
 	onUploadProgress: function(file) {
-		var barId = "#stream-process-bar_" + file.id;
-		$(barId + " .bar-width").css("width", file.percent + "%");
-		$(barId + " .stream-percent").html(file.percent + "%");
-		$(barId + " .stream-speed").html(file.formatSpeed);
-		$(barId + " .stream-uploaded").html(file.formatLoaded + "/" + file.formatSize);
-		$(barId + " .stream-remain-time").html(file.formatTimeLeft);
-		
-		var dataFile = DataFileMap[file.id];
-		dataFile['barWidth'] = "width: " + file.percent + "%;";
-		dataFile['percent'] = file.percent;
-		dataFile['formatSpeed'] = file.formatSpeed;
-		dataFile['formatLoaded'] = file.formatLoaded;
-		dataFile['formatSize'] = file.formatSize;
-		dataFile['formatTimeLeft'] = file.formatTimeLeft;
-		dataFile['totalPercent'] = file.totalPercent;
+		var params = {
+			id : file.id,
+			percent : file.percent,
+			formatSpeed : file.formatSpeed,
+			formatLoaded : file.formatLoaded,
+			formatSize : file.formatSize,
+			formatTimeLeft : file.formatTimeLeft,
+			totalPercent : file.totalPercent
+		}
+		setStreamProcessBar(params);
 	},
 	onStop: function() {
 	 	alert('onStop');
 	},
 	onCancelAll: function(numbers) {
 //	 	alert('onCancelAll');
-	}, onRepeatedFile: function(f) {}
+	}, 
+	onRepeatedFile: function(f) {
+	}
 };
 var _t = new Stream(config);
 </script>
