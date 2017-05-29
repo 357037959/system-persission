@@ -15,11 +15,12 @@ import java.util.UUID;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.apache.log4j.Logger;
 
 import com.ctvit.framework.common.config.Configurations;
+import com.ctvit.framework.common.util.ApplicationLogger;
 import com.ctvit.framework.common.util.IoUtil;
 import com.ctvit.framework.common.util.TokenUtil;
 import com.ctvit.upload.exception.StreamException;
@@ -31,14 +32,17 @@ import com.jfinal.ext.interceptor.POST;
 
 public class UploadController extends Controller {
 
+	private Logger logger = ApplicationLogger.getLogger(UploadController.class);
+
 	@Before(GET.class)
 	public void tk() {
-		String name = getPara(Configurations.FILE_NAME_FIELD);
+		String name = getFileName();
 		String size = getPara(Configurations.FILE_SIZE_FIELD);
+		String sessionId = UUID.randomUUID().toString().replace("-", "").toUpperCase();
 		String token = null;
 		Map<String, Object> json = new HashMap<String, Object>();
 		try {
-			token = TokenUtil.generateToken(name, size);
+			token = TokenUtil.generateToken(name, size, sessionId);
 			json.put(Configurations.TOKEN_FIELD, token);
 			if (Configurations.isCrossed()) {
 				json.put(Configurations.SERVER_FIELD, Configurations.getCrossServer());
@@ -46,8 +50,8 @@ public class UploadController extends Controller {
 			json.put(Configurations.SUCCESS, true);
 			json.put(Configurations.MESSAGE, "");
 			/** TODO: save the token. */
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error("[获取上传文件Token出现异常！" + e.getMessage() + "]", e);
 		}
 		renderJson(json);
 	}
@@ -105,12 +109,10 @@ public class UploadController extends Controller {
 			}
 
 			System.out.println("Form Saved : " + filename);
-		} catch (FileUploadException e) {
+		} catch (Exception e) {
 			success = false;
-			message = "Error: " + e.getLocalizedMessage();
-		} catch (IOException e) {
-			success = false;
-			message = "Error: " + e.getLocalizedMessage();
+			message = "Error: " + e.getMessage();
+			logger.error("[Form上传文件出现异常！" + e.getMessage() + "]", e);
 		} finally {
 			if (success) {
 				json.put(Configurations.START_FIELD, start);
@@ -139,12 +141,10 @@ public class UploadController extends Controller {
 			/** file size is 0 bytes. */
 			if (token.endsWith("_0") && "0".equals(size) && 0 == start)
 				f.renameTo(IoUtil.getFile(fileName));
-		} catch (FileNotFoundException e) {
-			message = "Error: " + e.getMessage();
+		} catch (Exception e) {
 			success = false;
-		} catch (IOException e) {
 			message = "Error: " + e.getMessage();
-			success = false;
+			logger.error("[获得文件上传位置出现异常！" + e.getMessage() + "]", e);
 		} finally {
 			if (success) {
 				json.put(Configurations.START_FIELD, start);
@@ -186,15 +186,18 @@ public class UploadController extends Controller {
 				out.write(bytes, 0, read);
 
 			start = f.length();
-		} catch (StreamException se) {
-			success = StreamException.ERROR_FILE_RANGE_START == se.getCode();
-			message = "Code: " + se.getCode();
-		} catch (FileNotFoundException fne) {
+		} catch (StreamException e) {
+			success = StreamException.ERROR_FILE_RANGE_START == e.getCode();
+			message = "Code: " + e.getCode();
+			logger.error("[文件上传出现异常！" + e.getMessage() + "]", e);
+		} catch (FileNotFoundException e) {
 			message = "Code: " + StreamException.ERROR_FILE_NOT_EXIST;
 			success = false;
-		} catch (IOException io) {
-			message = "IO Error: " + io.getMessage();
+			logger.error("[文件上传出现异常！" + e.getMessage() + "]", e);
+		} catch (Exception e) {
 			success = false;
+			message = "Error: " + e.getMessage();
+			logger.error("[文件上传出现异常！" + e.getMessage() + "]", e);
 		} finally {
 			IoUtil.close(out);
 			IoUtil.close(content);
@@ -211,6 +214,7 @@ public class UploadController extends Controller {
 				} catch (IOException e) {
 					success = false;
 					message = "Rename file error: " + e.getMessage();
+					logger.error("[文件重命名出现异常！" + e.getMessage() + "]", e);
 				}
 			}
 
