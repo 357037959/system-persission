@@ -748,7 +748,6 @@
 				that._handleFileTreeEntries(entries, callback);
 				(--callback.pending === 0) && callback(callback.files, self);
 			}, error = function(e) {
-				alert("Read file Error: " + e);
 				console && console.log(e);
 			}, read = function() {
 				reader.readEntries(function(results) {
@@ -1093,7 +1092,7 @@
 			this.fileStartPosValue = null;
 			this.retriedTimes = 0;
 
-			postVars.name = encodeURI(this.get("name"));
+			postVars.name = encodeURIComponent(this.get("name"));
 			postVars.size = this.get("size");
 			var method = this.get("uploadMethod");
 			this.set("uploadURL", 'formUpload' === method ? url : fAddVars(postVars, url));
@@ -1450,7 +1449,7 @@
 			var xhr = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject("Microsoft.XMLHTTP");
 			
 			var vars = {
-				name: encodeURI(file.get('name')),
+				name: encodeURIComponent(file.get('name')),
 				type: file.get('type'),
 				size: file.get('size'),
 				modified: file.get("dateModified") + ""
