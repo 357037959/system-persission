@@ -1,6 +1,5 @@
 package com.ctvit.framework.common.config;
 
-import com.ctvit.auth.model._MappingKit;
 import com.ctvit.auth.route.SystemRoutes;
 import com.ctvit.framework.common.util.BaseHandle;
 import com.ctvit.upload.roune.UploadRoutes;
@@ -10,13 +9,9 @@ import com.jfinal.config.Interceptors;
 import com.jfinal.config.JFinalConfig;
 import com.jfinal.config.Plugins;
 import com.jfinal.config.Routes;
-import com.jfinal.kit.PathKit;
 import com.jfinal.kit.PropKit;
-import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
-import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.activerecord.tx.TxByMethodRegex;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
-import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.render.ViewType;
 
 public class MainConfig extends JFinalConfig {
@@ -65,19 +60,19 @@ public class MainConfig extends JFinalConfig {
 	@Override
 	public void configPlugin(Plugins me) {
 		// 配置数据库连接池插件
-		C3p0Plugin c3p0Plugin = new C3p0Plugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password"));
+		// C3p0Plugin c3p0Plugin = new C3p0Plugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password"));
 		// orm映射 配置ActiveRecord插件
-		ActiveRecordPlugin arp = new ActiveRecordPlugin(c3p0Plugin);
-		arp.setShowSql(PropKit.getBoolean("devMode"));
-		arp.setDialect(new MysqlDialect());
+		// ActiveRecordPlugin arp = new ActiveRecordPlugin(c3p0Plugin);
+		// arp.setShowSql(PropKit.getBoolean("devMode"));
+		// arp.setDialect(new MysqlDialect());
 		/******** 在此添加数据库 表-Model 映射 *********/
-		_MappingKit.mapping(arp);
+		// _MappingKit.mapping(arp);
 		// 添加到插件列表中
-		me.add(c3p0Plugin);
-		me.add(arp);
+		// me.add(c3p0Plugin);
+		// me.add(arp);
 		// 配置缓存插件 两种方式都可以
-		String path = PathKit.getRootClassPath() + "/" + "ehcache.xml";
-		me.add(new EhCachePlugin(path));
+		// String path = PathKit.getRootClassPath() + "/" + "ehcache.xml";
+		// me.add(new EhCachePlugin(path));
 	}
 
 	/**
